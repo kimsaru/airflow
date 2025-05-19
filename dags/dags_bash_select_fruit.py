@@ -17,7 +17,7 @@ with DAG(
         bash_command="/opt/airflow/plugins/shell/test.sh test1",
     )
 
-    bash_t1 = BashOperator(
+    bash_t2 = BashOperator(
         task_id="bash_t1",
         bash_command="/opt/airflow/plugins/shell/test.sh test2",
     )
