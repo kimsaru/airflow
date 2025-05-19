@@ -3,7 +3,7 @@ import pendulum
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from common.common_func import get_sftp
+from common.common_func import get_sftp, regist
 
 with DAG(
     dag_id="dags_python_import_func",
@@ -12,9 +12,10 @@ with DAG(
     catchup=False
 ) as dag:
     
-    task_get_sftp = PythonOperator(
-        task_id = 'task_get_sftp',
-        python_callable=get_sftp
+    regist = PythonOperator(
+        task_id = 'regist',
+        python_callable = regist,
+        op_args = ['kim','man','kr','seoul']
     )
 
-    task_get_sftp
+    regist
