@@ -1,14 +1,18 @@
-import datetime
-import pendulum
-
 from airflow.models.dag import DAG
 from airflow.operators.bash import BashOperator
+from airflow.operators.empty import EmptyOperator
+
+import datetime
+import pendulum
 
 with DAG(
     dag_id="dags_bash_operator",
     schedule="0 0 * * *",
-    start_date=pendulum.datetime(2021, 1, 1, tz="Asia/Seoul"),
-    catchup=False
+    start_date=pendulum.datetime(2025, 5, 26, tz="Asia/Seoul"),
+    catchup=False,
+    # dagrun_timeout=datetime.timedelta(minutes=60),
+    # tags=["example", "example2"],
+    # params={"example_key": "example_value"}, 모든 task들에게 공통적으로 넘겨줄 마라메타타
 ) as dag:
     
     bash_t1 = BashOperator(
