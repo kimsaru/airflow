@@ -11,7 +11,7 @@ with DAG(
     start_date=pendulum.datetime(2025, 5, 26, tz="Asia/Seoul"),
     catchup=False,
     # dagrun_timeout=datetime.timedelta(minutes=60),
-    # tags=["example", "example2"],
+    tags=["testtest1"],
     # params={"example_key": "example_value"}, 모든 task들에게 공통적으로 넘겨줄 마라메타타
 ) as dag:
     
