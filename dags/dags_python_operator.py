@@ -9,6 +9,7 @@ with DAG(
     dag_id="dags_python_operator",
     schedule="30 6 * * *",
     start_date=pendulum.datetime(2025, 5, 1, tz="Asia/Seoul"),
+    tags=["testtest1"],
     catchup=False
 ) as dag:
     
