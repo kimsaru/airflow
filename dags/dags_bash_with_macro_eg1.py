@@ -9,7 +9,7 @@ with DAG(
     schedule="10 0 L * *",
     start_date=pendulum.datetime(2025, 5, 25, tz="Asia/Seoul"),
     tags=["testtest1"],
-    catchup=False,
+    catchup=False
 ) as dag:
     
     bash_t1 = BashOperator(
@@ -18,5 +18,5 @@ with DAG(
             'START_DATE':'{{ data_interval_start.in_timezone("Asia/Seoul") | ds }}',
             'END_DATE':'{{ (data_interval_end.in_timezone("Asia/Seoul") - macros.dateutil.relativedelta.relativedelta(days=1)) | ds }}'
         },
-        bash_command="echo 'START_DATE: $START_DATE' && echo 'START_DATE: $END_DATE'"
+        bash_command="echo START_DATE: $START_DATE && echo END_DATE: $END_DATE"
     )
