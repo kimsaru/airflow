@@ -28,5 +28,6 @@ with DAG(
         print('함수 입력값으로 받은 값: ' + status)
 
 
-    xcom_push_result() >> xcom_pull_1()
-    xcom_pull_2(xcom_push_result())
+    test = xcom_push_result()
+    xcom_pull_2(test)
+    test >> xcom_pull_1()
