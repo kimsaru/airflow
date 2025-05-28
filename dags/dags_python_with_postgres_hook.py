@@ -16,7 +16,7 @@ with DAG(
         from airflow.providers.postgres.hooks.postgres import PostgresHook
         from contextlib import closing
 
-        postgres_hook = postgres_hook(conn_db_postgres_custom)
+        postgres_hook = PostgresHook(conn_db_postgres_custom)
 
         with closing(postgres_hook.get_conn()) as conn:
             with closing(conn.cursor()) as cursor:
