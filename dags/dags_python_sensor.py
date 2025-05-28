@@ -24,7 +24,7 @@ with DAG(
 
         key_nm = list(contents.keys())[0]
         row_data = contents.get(key_nm).get('row')
-        last_dt = row_data[0].get('base_dt_col')
+        last_dt = row_data[0].get(base_dt_col)
         last_date = last_dt[:10]
         last_date = last_date.replace('.','-').replace('/','-')
 
