@@ -5,7 +5,7 @@ import datetime
 import pendulum
 
 with DAG(
-    dag_id="dags_time_sensor with_async",
+    dag_id="dags_time_sensor_with_async",
     schedule="*/10 * * * *",
     start_date=pendulum.datetime(2025, 5, 26, 0, 0, 0),
     end_date=pendulum.datetime(2025, 5, 26, 1, 0, 0),
