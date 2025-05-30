@@ -10,7 +10,7 @@ from airflow.utils.dates import days_ago
 def get_query_for_yesterday_partition() -> str:
     return """
         SELECT id, player1_id, battle_date as event_date FROM `gcloud-yj.basic.battle` 
-        WHERE id in (94,95) and battle_date = PARSE_DATE('%Y-%m-%d', '2023-07-16')
+        WHERE battle_date between PARSE_DATE('%Y-%m-%d', '2023-07-15') and PARSE_DATE('%Y-%m-%d', '2023-07-16')
     """
 
 with DAG(
