@@ -13,7 +13,7 @@ def get_query_for_yesterday_partition() -> str:
     """
 
 with DAG(
-    dag_id="dags_gcp_operator",
+    dag_id="dags_gcp_operator_1",
     start_date=days_ago(1),
     schedule_interval=None,
     catchup=False,
