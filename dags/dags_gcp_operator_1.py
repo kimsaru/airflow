@@ -35,5 +35,6 @@ with DAG(
                 "useLegacySql": False
             }
         },
-        location="US"
+        location="US",
+        gcp_conn_id="airflow_bigquery_test",
     )
