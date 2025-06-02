@@ -15,10 +15,11 @@ def check_word_count(**context):
     print(f"{df}")
 
 with DAG(
-    dag_id="bq_query_export_check",
+    dag_id="dags_gcp_operator_2",
     start_date=days_ago(1),
     schedule_interval=None,
     catchup=False,
+    tags=["bigquery"],
 ) as dag:
 
     run_query = BigQueryInsertJobOperator(
