@@ -1,58 +1,57 @@
 from airflow import DAG
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryInsertJobOperator,
-    BigQueryGetDataOperator,
-)
+from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator, BigQueryToGCSOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
-
-def print_bq_result(ti):
-    result = ti.xcom_pull(task_ids='get_bq_result')
-    print("BigQuery Query Result:")
-    for row in result:
-        print(row)
-
+def check_word_count(**context):
+    hook = BigQueryHook(gcp_conn_id="airflow_bigquery_test", location="US")
+    sql = """
+        SELECT id, player1_id, event_date
+        FROM `gcloud-yj.basic.test_by_partition_temp`
+    """
+    df = hook.get_pandas_df(sql=sql)
+    print(f"{df}")
 
 with DAG(
-    dag_id="dags_gcp_operator_2",
+    dag_id="bq_query_export_check",
     start_date=days_ago(1),
     schedule_interval=None,
     catchup=False,
-    tags=["bigquery"],
 ) as dag:
 
-    # Step 1: BigQuery 쿼리를 결과 테이블에 저장
-    export_query_to_gcs = BigQueryInsertJobOperator(
-        task_id="export_query_to_gcs",
+    run_query = BigQueryInsertJobOperator(
+        task_id="run_query",
         configuration={
             "query": {
                 "query": """
                     SELECT id, player1_id, event_date FROM `gcloud-yj.basic.test_by_partition`
-                    LIMIT 5
                 """,
                 "useLegacySql": False,
                 "destinationTable": {
                     "projectId": "gcloud-yj",
                     "datasetId": "basic",
-                    "tableId": "test_by_partition_temp"
+                    "tableId": "test_by_partition_temp1"
                 },
                 "writeDisposition": "WRITE_TRUNCATE",
-            },"extract": {
-                "sourceTable": {
-                    "projectId": "gcloud-yj",  
-                    "datasetId": "basic",
-                    "tableId": "test_by_partition_temp"
-                },
-                "destinationUris": [
-                    "gs://jin_com/airflow/output.csv"  
-                ],
-                "destinationFormat": "CSV",
-                "printHeader": True,
-            },
+            }
         },
         location="US",
         gcp_conn_id="airflow_bigquery_test",
     )
 
-   
+    export_to_gcs = BigQueryToGCSOperator(
+        task_id="export_to_gcs",
+        source_project_dataset_table="gcloud-yj.basic.test_by_partition_temp1",
+        destination_cloud_storage_uris=["gs://jin_com/airflow/output.csv"],
+        export_format="CSV",
+        print_header=True,
+        gcp_conn_id="airflow_bigquery_test",
+    )
+
+    check_condition = PythonOperator(
+        task_id="check_condition",
+        python_callable=check_word_count,
+    )
+
+    run_query >> export_to_gcs >> check_condition
