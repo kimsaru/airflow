@@ -15,7 +15,7 @@ def print_bq_result(ti):
 
 
 with DAG(
-    dag_id="dags_gcp_operator",
+    dag_id="dags_gcp_operator_2",
     start_date=days_ago(1),
     schedule_interval=None,
     catchup=False,
