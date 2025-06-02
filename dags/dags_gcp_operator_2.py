@@ -49,6 +49,7 @@ with DAG(
         export_format="CSV",
         print_header=True,
         gcp_conn_id="airflow_bigquery_test",
+        force_rerun=True,
     )
 
     check_condition = PythonOperator(
