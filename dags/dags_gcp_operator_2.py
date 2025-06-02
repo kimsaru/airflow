@@ -5,15 +5,6 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
-def check_word_count(**context):
-    hook = BigQueryHook(gcp_conn_id="airflow_bigquery_test", location="US")
-    sql = """
-        SELECT id, player1_id, event_date
-        FROM `gcloud-yj.basic.test_by_partition_temp`
-    """
-    df = hook.get_pandas_df(sql=sql)
-    print(f"{df}")
-
 with DAG(
     dag_id="dags_gcp_operator_2",
     start_date=days_ago(1),
@@ -52,9 +43,4 @@ with DAG(
         force_rerun=True,
     )
 
-    check_condition = PythonOperator(
-        task_id="check_condition",
-        python_callable=check_word_count,
-    )
-
-    run_query >> export_to_gcs >> check_condition
+    run_query >> export_to_gcs
