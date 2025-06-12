@@ -30,9 +30,9 @@ with DAG(
         bash_command="echo $HOSTNAME",
     )
 
-    bash_t4= BashOperator(
+    bash_t4_1= BashOperator(
         task_id="bash_t4",
         bash_command="echo $HOSTNAME",
     )
 
-    bash_t1 >> bash_t2 >> bash_t3 >> bash_t4
+    bash_t1 >> bash_t2 >> bash_t3 >> bash_t4_1
