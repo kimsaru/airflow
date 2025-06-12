@@ -36,3 +36,4 @@ with DAG(
     )
 
     bash_t1 >> bash_t2 >> bash_t3 >> bash_t4_1
+
