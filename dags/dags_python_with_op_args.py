@@ -13,10 +13,10 @@ with DAG(
     catchup=False
 ) as dag:
     
-    regist_t2 = PythonOperator(
+    regist_t1 = PythonOperator(
         task_id = 'regist_t1',
         python_callable=regist,
         op_args=['hjkim','man','kr','seoul']
     )
 
-    regist_t2
+    regist_t1
