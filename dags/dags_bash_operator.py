@@ -26,7 +26,7 @@ with DAG(
     )
 
     bash_t3_kim_1 = BashOperator(
-        task_id="bash_t3",
+        task_id="bash_t3_kim_1",
         bash_command="echo $HOSTNAME",
     )
 
