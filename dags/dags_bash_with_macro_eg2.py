@@ -12,8 +12,8 @@ with DAG(
     catchup=False,
 ) as dag:
     
-    bash_t1_dev = BashOperator(
-        task_id="bash_t1_dev",
+    bash_t1 = BashOperator(
+        task_id="bash_t1",
         env={
             'START_DATE':'{{ (data_interval_end.in_timezone("Asia/Seoul") - macros.dateutil.relativedelta.relativedelta(days=19)) | ds}}',
             'END_DATE':'{{ (data_interval_end.in_timezone("Asia/Seoul") - macros.dateutil.relativedelta.relativedelta(days=14)) | ds}}'

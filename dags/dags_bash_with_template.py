@@ -17,11 +17,6 @@ with DAG(
         bash_command="echo 'data_interval_end: {{ data_interval_end }} '"
     )
 
-    bash_t1_1 = BashOperator(
-        task_id="bash_t1_1",
-        bash_command="echo 'data_interval_end: {{ data_interval_end }} '"
-    )
-
     bash_t2 = BashOperator(
         task_id="bash_t2",
         env={
