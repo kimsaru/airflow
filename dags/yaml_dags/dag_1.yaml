@@ -1,7 +1,7 @@
 dag:
   dag_id: dag_1
   schedule_interval: "@daily"
-  start_date: 2023-01-01
+  start_date: "2023-01-01"
   catchup: false
 
 tasks:
