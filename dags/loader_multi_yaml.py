@@ -9,9 +9,23 @@ def load_yaml_dag(yaml_path):
         config = yaml.safe_load(f)
 
     dag_config = config['dag']
+
+    def parse_start_date(val):
+        # val이 이미 datetime 또는 date 타입이면 datetime으로 변환 후 반환
+        if isinstance(val, datetime):
+            return val
+        if isinstance(val, date):
+            return datetime(val.year, val.month, val.day)
+        # 문자열이면 fromisoformat 사용
+        if isinstance(val, str):
+            return datetime.fromisoformat(val)
+        raise ValueError(f"Cannot parse start_date: {val}")
+
+    # 기존 코드에서 start_date 부분만 변경
+    start_date = parse_start_date(dag_config['start_date'])
     dag = DAG(
         dag_id=dag_config['dag_id'],
-        start_date=datetime.fromisoformat(dag_config['start_date']),
+        start_date=start_date,
         schedule_interval=dag_config.get('schedule_interval'),
         catchup=dag_config.get('catchup', False),
     )
