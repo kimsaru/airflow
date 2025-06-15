@@ -1,0 +1,9 @@
+dag:
+  dag_id: dag_1
+  schedule_interval: "@daily"
+  start_date: 2023-01-01
+  catchup: false
+
+tasks:
+  - task_id: start
+    operator: airflow.operators.dummy.DummyOperator
