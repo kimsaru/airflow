@@ -23,7 +23,7 @@ with DAG(
     # 실패를 유도하기 위해 존재하지 않는 endpoint 사용
     failing_http_sensor = HttpSensor(
         task_id='failing_http_sensor',
-        http_conn_id='my_api_server',
+        http_conn_id='openapi.seoul.go.kr',
         endpoint='fake/endpoint',
         method='GET',
         response_check=lambda response: "OK" in response.text,
