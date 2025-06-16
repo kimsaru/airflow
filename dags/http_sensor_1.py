@@ -10,7 +10,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id='http_sensor_trigger_rule_test_1',
+    dag_id='http_sensor_1',
     default_args=default_args,
     start_date=days_ago(1),
     schedule_interval=None,
@@ -30,13 +30,12 @@ with DAG(
         poke_interval=5,
         timeout=10,
         mode='poke',
-        soft_fail=False  # 실패를 DAG 실패로 반영 (중요!)
+        soft_fail=True  # 실패를 DAG 실패로 반영 (중요!)
     )
 
     task_all_done = BashOperator(
         task_id='task_all_done',
-        bash_command='echo "Runs regardless of upstream result"',
-        trigger_rule=TriggerRule.ALL_DONE
+        bash_command='echo "Runs regardless of upstream result"'
     )
 
     # DAG 구조
