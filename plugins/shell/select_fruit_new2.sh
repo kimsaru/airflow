@@ -1,1 +1,0 @@
-echo "select_fruit_new2"
