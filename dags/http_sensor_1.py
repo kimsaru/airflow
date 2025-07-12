@@ -14,7 +14,7 @@ with DAG(
     default_args=default_args,
     start_date=days_ago(1),
     schedule_interval=None,
-    tags=["testtest2"],
+    tags=["testtest3"],
     catchup=False
 ) as dag:
 
@@ -23,13 +23,13 @@ with DAG(
     # 실패를 유도하기 위해 존재하지 않는 endpoint 사용
     failing_http_sensor = HttpSensor(
         task_id='failing_http_sensor',
-        http_conn_id='openapi.seoul.go.kr',
-        endpoint='fake/endpoint',
+        http_conn_id='my_api_server',
+        endpoint='check_pin_file',
         method='GET',
-        response_check=lambda response: "OK" in response.text,
-        poke_interval=5,
-        timeout=10,
-        mode='poke',
+        response_check=lambda response: response.json().get("file_exists") is True,
+        poke_interval=30,
+        timeout=600,
+        mode='reschedule',
         soft_fail=True  # 실패를 DAG 실패로 반영 (중요!)
     )
 
