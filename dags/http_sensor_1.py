@@ -26,7 +26,7 @@ with DAG(
         http_conn_id='my_api_server',
         endpoint='check_pin_file',
         method='GET',
-        response_check=lambda response: response.json().get("file_exists") is True,
+        response_check=lambda response: response.json().get("status") == 'OK',
         poke_interval=30,
         timeout=600,
         mode='reschedule',
