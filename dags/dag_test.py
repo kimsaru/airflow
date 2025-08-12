@@ -3,18 +3,18 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 import os
 import time
 
 def process_df(part_df, idx):
     pid = os.getpid()
-    print(f"[프로세스 {idx}] PID: {pid} - 처리 시작 - 행 수: {len(part_df)}")
+    print(f"[스레드 {idx}] PID: {pid} - 처리 시작 - 행 수: {len(part_df)}")
     
     # 처리 작업 예시 (시간 지연 추가)
     time.sleep(2)
     
-    print(f"[프로세스 {idx}] PID: {pid} - 처리 완료")
+    print(f"[스레드 {idx}] PID: {pid} - 처리 완료")
     return len(part_df)
 
 def parallel_dataframe_processing():
@@ -27,23 +27,22 @@ def parallel_dataframe_processing():
     indices = np.array_split(df.index, num_parts)
     df_parts = [df.loc[i].reset_index(drop=True) for i in indices]
 
-    with ProcessPoolExecutor(max_workers=num_parts) as executor:
+    with ThreadPoolExecutor(max_workers=num_parts) as executor:
         futures = []
         for idx, part in enumerate(df_parts):
             futures.append(executor.submit(process_df, part, idx))
 
         for i, future in enumerate(futures):
-            # 완료 여부 확인
             done = future.done()
-            print(f"[메인] 프로세스 {i} 완료 여부: {done}")
-            result = future.result()  # 여기서 결과를 기다림
-            print(f"[메인] 프로세스 {i} 결과: {result}")
+            print(f"[메인] 스레드 {i} 완료 여부: {done}")
+            result = future.result()
+            print(f"[메인] 스레드 {i} 결과: {result}")
 
 default_args = {
     'start_date': datetime(2023, 1, 1),
 }
 
-with DAG('dag_processpool',
+with DAG('dag_threadpool',
          schedule_interval=None,
          catchup=False,
          default_args=default_args) as dag:
