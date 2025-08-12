@@ -6,11 +6,12 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import os
 import time
+import threading
 
 def process_df(part_df, idx):
     pid = os.getpid()
-    print(f"[스레드 {idx}] PID: {pid} - 처리 시작 - 행 수: {len(part_df)}")
-    
+    tid = threading.get_ident()  # 스레드 ID
+    print(f"[스레드 {idx}] PID: {pid}, TID: {tid} - 처리 시작 - 행 수: {len(part_df)}")
     # 처리 작업 예시 (시간 지연 추가)
     time.sleep(2)
     
