@@ -8,7 +8,7 @@ def check_file_exists(response):
 
 with DAG(
     dag_id='check_file_api_sensor',
-    start_date=days_ago(1),
+    start_date=days_ago(2),
     schedule_interval=None,
     catchup=False,
 ) as dag:
