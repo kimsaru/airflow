@@ -4,6 +4,6 @@ from routers import aaa    # 새 라우터 추가
 
 app = FastAPI()
 
-# 라우터 등록
+# 라우터 등록 --
 app.include_router(items.router)
 app.include_router(aaa.router)  # 새 라우터 등록
