@@ -4,6 +4,8 @@ from airflow.operators.python import PythonOperator
 
 def print_time():
     print("This runs every 10 minutes!")
+    import cryptography
+    print(cryptography.__version__)
 
 with DAG(
     dag_id="basic",
