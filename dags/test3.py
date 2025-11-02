@@ -8,20 +8,25 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 from airflow.hooks.base import BaseHook
+from airflow.utils.dates import days_ago
 
 def send_signed_request(**context):
     import cryptography
     print(cryptography.__version__)
 
 
-with DAG(
-    dag_id="test3",
-    schedule_interval=None,
-    start_date=datetime(2025, 10, 1),
-    catchup=False,
-    tags=["testtest1"],
-) as dag:
+default_args = {
+    'owner': 'airflow',
+}
 
+with DAG(
+    dag_id='test3',
+    default_args=default_args,
+    start_date=days_ago(1),
+    schedule_interval=None,
+    tags=["testtest3"],
+    catchup=False
+) as dag:
     send_signed_request_task = PythonOperator(
         task_id="send_signed_request_task",
         python_callable=send_signed_request,
