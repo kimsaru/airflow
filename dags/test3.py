@@ -17,7 +17,7 @@ def send_signed_request(**context):
 with DAG(
     dag_id="test3",
     schedule_interval=None,
-    start_date=datetime(2025, 11, 1),
+    start_date=datetime(2025, 10, 1),
     catchup=False,
     tags=["testtest1"],
 ) as dag:
