@@ -29,5 +29,5 @@ with DAG(
         task_id="process_value",
         python_callable=process_value,
     ).expand(
-        op_kwargs=generate_values_task.output.map(lambda r: {"row": r})
+        op_args=[[r] for r in generate_values_task.output]
     )
