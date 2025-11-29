@@ -1,19 +1,16 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from datetime import datetime
 from airflow.utils.dates import days_ago
-from airflow.operators.python import PythonOperator
-from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
 
-def print_gcp_credentials():
-    hook = GoogleBaseHook(gcp_conn_id="airflow_bigquery_test")
-    credentials = hook.get_credentials()
-    project_id = hook.project_id
+def generate_values():
+    # 길이가 가변적인 리스트
+    return [[1, 2], [3, 4, 5], [6]]
 
-    print("Project ID:", project_id)
-    print("Credentials type:", type(credentials))
-    # service account info 확인 가능
-    if hasattr(credentials, "service_account_email"):
-        print("Service account email:", credentials.service_account_email)
+def process_value(row):
+    print("Row:", row)
+    for v in row:
+        print("Value:", v)
 
 with DAG(
     dag_id="dags_gcp_operator_1",
@@ -23,7 +20,14 @@ with DAG(
     tags=["bigquery"],
 ) as dag:
 
-    test_task = PythonOperator(
-        task_id="print_gcp_credentials",
-        python_callable=print_gcp_credentials,
+    generate_values_task = PythonOperator(
+        task_id="generate_values",
+        python_callable=generate_values,
+    )
+
+    PythonOperator.partial(
+        task_id="process_value",
+        python_callable=process_value,
+    ).expand(
+        op_args=generate_values_task.output
     )
