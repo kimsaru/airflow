@@ -1,84 +1,82 @@
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
-from airflow.utils.trigger_rule import TriggerRule
-from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
-from google.cloud import bigquery
 from datetime import datetime
+from google.cloud import bigquery
+from airflow.providers.google.common.hooks.base_google import GoogleBaseHook
 
-# ---------------------------
-# 1. SQL 생성 함수
-# ---------------------------
+# -----------------------------
+# 함수 정의
+# -----------------------------
+
 def generate_insert_sql_chunks():
-    total_inserts = 6
-    group_size = 2
-    results = []
-    current_group = []
+    """
+    200개 이상 SQL 생성 → chunk_size=100 으로 나누어
+    Dynamic Task Mapping에서 task가 2개 생성되도록 함
+    """
+    countries = [f"country_{i}" for i in range(20)]  # 20개 나라
+    tests = [f"test_{i}" for i in range(11)]        # 10개 테스트
 
-    for i in range(1, total_inserts + 1):
-        table_index = ((i - 1) % 3) + 1
-        sql = f"""
-        INSERT INTO `basic.table_{table_index}` (id, name, created_at)
-        VALUES ({i}, 'name_{i}', CURRENT_TIMESTAMP())
-        """
-        current_group.append(sql)
+    # 20 × 10 = 200개 SQL 생성됨
+    all_sql = []
 
-        if len(current_group) == group_size:
-            results.append(current_group)
-            current_group = []
+    for c in countries:
+        for t in tests:
+            sql = f"""
+            INSERT INTO `basic.my_table` 
+            (country, test_name, created_at)
+            VALUES ('{c}', '{t}', CURRENT_TIMESTAMP())
+            """
+            all_sql.append(sql)
 
-    if current_group:
-        results.append(current_group)
+    # 100개씩 chunk
+    chunk_size = 100
+    results = [all_sql[i:i + chunk_size] for i in range(0, len(all_sql), chunk_size)]
 
-    return results  # 예: [['sql1','sql2'], ['sql3','sql4'], ['sql5','sql6']]
+    print(f"총 SQL 개수: {len(all_sql)}")
+    print(f"chunk 개수: {len(results)}")
+    print(f"첫 번째 chunk 크기: {len(results[0])}")
+    print(f"두 번째 chunk 크기: {len(results[1])}")
 
-# ---------------------------
-# 2. SQL 실행 함수
-# ---------------------------
-def execute_sql_chunk(row):
-    # Airflow Connection에서 GCP 인증 정보 가져오기
-    hook = GoogleBaseHook(gcp_conn_id="airflow_bigquery_test")
+    return results
+
+def execute_sql_chunk(row, gcp_conn_id="google_cloud_default"):
+    """
+    각 chunk의 SQL 리스트 실행
+    """
+    # Airflow Connection에서 Credential 가져오기
+    hook = GoogleBaseHook(gcp_conn_id=gcp_conn_id)
     credentials = hook.get_credentials()
     project_id = hook.project_id
 
+    # BigQuery Client 생성
     client = bigquery.Client(credentials=credentials, project=project_id)
 
     for sql in row:
-        job = client.query(sql)
-        job.result()  # 완료 대기
-        print(f"Executed SQL: {sql}")
+        query_job = client.query(sql)
+        query_job.result()  # 실행 완료까지 대기
+        print(f"sql: {sql}")
 
-# ---------------------------
+# -----------------------------
 # DAG 정의
-# ---------------------------
+# -----------------------------
+
 with DAG(
-    dag_id="bq_dynamic_insert_client",
-    start_date=datetime(2024, 1, 1),
+    dag_id="bq_dynamic_task_mapping_chunks",
+    start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
 ) as dag:
 
-    # 시작 Empty Task
-    start = EmptyOperator(task_id="start")
-
     # SQL 생성 Task
     generate_sql_task = PythonOperator(
-        task_id="generate_insert_sql_chunks",
+        task_id="generate_sql_chunks",
         python_callable=generate_insert_sql_chunks
     )
 
-    # SQL 실행 Dynamic Task Mapping
-    execute_sql_task = PythonOperator.partial(
-        task_id="execute_insert_sql_chunk",
+    # Dynamic Task Mapping으로 SQL chunk 실행
+    PythonOperator.partial(
+        task_id="execute_sql_chunk",
         python_callable=execute_sql_chunk
     ).expand(
         op_kwargs=generate_sql_task.output.map(lambda r: {"row": r})
     )
-
-    # 종료 Empty Task (모든 task 완료 대기)
-    end = EmptyOperator(
-        task_id="end",
-        trigger_rule=TriggerRule.ALL_DONE
-    )
-
-    start >> generate_sql_task >> execute_sql_task >> end
