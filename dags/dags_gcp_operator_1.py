@@ -39,7 +39,7 @@ def generate_insert_sql_chunks():
 
     return results
 
-def execute_sql_chunk(row, gcp_conn_id="google_cloud_default"):
+def execute_sql_chunk(row, gcp_conn_id="airflow_bigquery_test"):
     """
     각 chunk의 SQL 리스트 실행
     """
