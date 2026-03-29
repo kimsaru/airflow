@@ -21,7 +21,7 @@ default_args = {
 with DAG(
     dag_id='ttest2',
     default_args=default_args,
-    start_date=datetime(2026, 3, 27),
+    start_date=datetime(2026, 3, 25),
     schedule_interval='@daily',
     catchup=True
 ) as dag:
