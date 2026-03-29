@@ -14,6 +14,7 @@ def fail_task(task_name, **context):
 default_args = {
     'depends_on_past': True,
     # 'wait_for_downstream': True,
+    'max_active_runs' : 1,
     'retries': 0
 }
 
